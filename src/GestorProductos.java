@@ -143,6 +143,7 @@ public class GestorProductos extends JFrame {
         cmbCategoria.addItem("Bebidas");
         cmbCategoria.addItem("Limpieza");
         cmbCategoria.addItem("Verduleria");
+        cmbCategoria.addItem("Tecnologia");
         cmbCategoria.addItem("Otros");
 
         // Agregamos el ComboBox.
@@ -530,6 +531,7 @@ public class GestorProductos extends JFrame {
         cmbEditarCategoria.addItem("Bebidas");
         cmbEditarCategoria.addItem("Limpieza");
         cmbEditarCategoria.addItem("Verduleria");
+        cmbEditarCategoria.addItem("Tecnologia");
         cmbEditarCategoria.addItem("Otros");
         cmbEditarCategoria.setSelectedItem(categoria);
         panel.add(new JLabel("Nombre:"));
@@ -547,11 +549,42 @@ public class GestorProductos extends JFrame {
 
         JButton btnGuardar =
         new JButton("Guardar cambios");
+        btnGuardar.addActionListener(e -> {
+         guardarCambios(
+            dialogo,
+            txtEditarNombre,
+            txtEditarPrecio,
+            txtEditarStock,
+            cmbEditarCategoria
+           );
+        });
 
         dialogo.add(panel, BorderLayout.CENTER);
         dialogo.add(btnGuardar, BorderLayout.SOUTH);
         dialogo.setVisible(true);
  }
+
+        //METODO GUARDAR CAMBIOS
+        private void guardarCambios(
+        JDialog dialogo,
+        JTextField txtEditarNombre,
+        JTextField txtEditarPrecio,
+        JTextField txtEditarStock,
+        JComboBox<String> cmbEditarCategoria
+) {
+    String nombre =
+            txtEditarNombre.getText().trim();
+
+    String precioTexto =
+            txtEditarPrecio.getText().trim();
+
+    String stockTexto =
+            txtEditarStock.getText().trim();
+
+    String categoria =
+            cmbEditarCategoria.getSelectedItem().toString();
+
+            
 
     // ========================================================
     // LIMPIAR FORMULARIO
