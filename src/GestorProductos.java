@@ -511,6 +511,29 @@ public class GestorProductos extends JFrame {
 
         dialogo.setSize(400, 300);
         dialogo.setLocationRelativeTo(this);  
+
+        JPanel panel =
+        new JPanel(new GridLayout(4, 2, 10, 10));
+
+        panel.setBorder(
+        BorderFactory.createEmptyBorder(  15, 15, 15, 15));
+        JTextField txtEditarNombre =
+        new JTextField(nombre);
+
+       JTextField txtEditarPrecio =
+        new JTextField(precio);
+
+      JTextField txtEditarStock =
+        new JTextField(stock);
+
+      JComboBox<String> cmbEditarCategoria =
+        new JComboBox<>();
+        cmbEditarCategoria.addItem("Almacén");
+        cmbEditarCategoria.addItem("Bebidas");
+        cmbEditarCategoria.addItem("Limpieza");
+        cmbEditarCategoria.addItem("Verduleria");
+        cmbEditarCategoria.addItem("Otros");
+        cmbEditarCategoria.setSelectedItem(categoria);
  }
 
     // ========================================================
