@@ -493,7 +493,25 @@ public class GestorProductos extends JFrame {
      }
 
      filaEditando = filaSeleccionada;
-  }
+
+     String nombre =
+        modelo.getValueAt(filaEditando, 0).toString();
+
+     String precio =
+        modelo.getValueAt(filaEditando, 1).toString();
+
+     String stock =
+        modelo.getValueAt(filaEditando, 2).toString();
+
+     String categoria =
+        modelo.getValueAt(filaEditando, 3).toString();
+
+      JDialog dialogo =
+        new JDialog(this, "Editar producto", true);
+
+        dialogo.setSize(400, 300);
+        dialogo.setLocationRelativeTo(this);  
+ }
 
     // ========================================================
     // LIMPIAR FORMULARIO
