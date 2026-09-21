@@ -42,7 +42,7 @@ public class GestorProductos extends JFrame {
 
     // DefaultTableModel administra las filas y columnas.
     private DefaultTableModel modelo;
-
+    private int filaEditando = -1;
 
     // ========================================================
     // COMPONENTE PARA MOSTRAR EL TOTAL
@@ -212,7 +212,10 @@ public class GestorProductos extends JFrame {
             // Ejecutamos nuestro método.
             agregarProducto();
         });
-
+        //editar
+        btnEditar.addActionListener(e -> {
+        editarProducto();
+        });
 
         // ====================================================
         // EVENTO LIMPIAR
@@ -474,6 +477,23 @@ public class GestorProductos extends JFrame {
         );
     }
 
+    //EDITAR
+    private void editarProducto() {
+     int filaSeleccionada =
+            tabla.getSelectedRow();
+
+     if (filaSeleccionada == -1) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Debe seleccionar un producto.",
+                "Aviso",
+                JOptionPane.WARNING_MESSAGE
+        );
+        return;
+     }
+
+     filaEditando = filaSeleccionada;
+  }
 
     // ========================================================
     // LIMPIAR FORMULARIO
