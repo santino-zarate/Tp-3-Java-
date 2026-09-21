@@ -584,7 +584,56 @@ public class GestorProductos extends JFrame {
     String categoria =
             cmbEditarCategoria.getSelectedItem().toString();
 
-            
+     if (nombre.isEmpty() ||
+                precioTexto.isEmpty() ||
+                stockTexto.isEmpty()) {
+
+        JOptionPane.showMessageDialog(
+                dialogo,
+                "Debe completar todos los campos.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+        );
+        return;
+        }
+        double precio;
+        int stock;
+        try {
+        precio = Double.parseDouble(precioTexto);
+        } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(
+                dialogo,
+                "El precio debe ser un número válido.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+        );
+        txtEditarPrecio.requestFocus();
+        return;
+        }
+        try {
+        stock =
+                Integer.parseInt(stockTexto);
+        } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(
+                dialogo,
+                "El stock debe ser un número entero.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+        );
+        txtEditarStock.requestFocus();
+        return;
+        }       
+        
+        if (precio <= 0 || stock < 0) {
+        JOptionPane.showMessageDialog(
+                dialogo,
+                "El precio debe ser mayor que cero y el stock no puede ser negativo.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+        );
+        txtEditarPrecio.requestFocus();
+        return;
+        }
 
     // ========================================================
     // LIMPIAR FORMULARIO
