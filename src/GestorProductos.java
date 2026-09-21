@@ -83,7 +83,7 @@ public class GestorProductos extends JFrame {
 
         // Creamos un panel con 5 filas y 2 columnas.
         JPanel panelFormulario =
-                new JPanel(new GridLayout(5, 2, 10, 10));
+                new JPanel(new GridLayout(6, 2, 10, 10));
 
         // Agregamos un margen interno al formulario.
         panelFormulario.setBorder(
@@ -155,10 +155,13 @@ public class GestorProductos extends JFrame {
 
         JButton btnAgregar = new JButton("Agregar");
         JButton btnLimpiar = new JButton("Limpiar");
+        JButton btnEditar = new JButton("Editar");
+        JButton btnGuardarCambios = new JButton("Guardar cambios");
 
         panelFormulario.add(btnAgregar);
         panelFormulario.add(btnLimpiar);
-
+        panelFormulario.add(btnEditar);
+        panelFormulario.add(btnGuardarCambios);
 
         // ====================================================
         // CREAR TABLA
