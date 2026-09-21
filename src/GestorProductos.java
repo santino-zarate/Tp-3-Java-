@@ -157,8 +157,8 @@ public class GestorProductos extends JFrame {
         JButton btnLimpiar = new JButton("Limpiar");
         JButton btnEditar = new JButton("Editar");
 
-        panelFormulario.add(btnAgregar);
         panelFormulario.add(btnLimpiar);
+        panelFormulario.add(btnAgregar);
         panelFormulario.add(btnEditar);
        
         // ====================================================
