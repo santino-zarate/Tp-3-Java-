@@ -156,13 +156,11 @@ public class GestorProductos extends JFrame {
         JButton btnAgregar = new JButton("Agregar");
         JButton btnLimpiar = new JButton("Limpiar");
         JButton btnEditar = new JButton("Editar");
-        JButton btnGuardarCambios = new JButton("Guardar cambios");
 
         panelFormulario.add(btnAgregar);
         panelFormulario.add(btnLimpiar);
         panelFormulario.add(btnEditar);
-        panelFormulario.add(btnGuardarCambios);
-
+       
         // ====================================================
         // CREAR TABLA
         // ====================================================
@@ -477,7 +475,7 @@ public class GestorProductos extends JFrame {
         );
     }
 
-    //EDITAR
+    //MÉTODO EDITAR
     private void editarProducto() {
      int filaSeleccionada =
             tabla.getSelectedRow();
@@ -534,6 +532,25 @@ public class GestorProductos extends JFrame {
         cmbEditarCategoria.addItem("Verduleria");
         cmbEditarCategoria.addItem("Otros");
         cmbEditarCategoria.setSelectedItem(categoria);
+        panel.add(new JLabel("Nombre:"));
+
+        panel.add(txtEditarNombre);
+
+        panel.add(new JLabel("Precio:"));
+        panel.add(txtEditarPrecio);
+
+        panel.add(new JLabel("Stock:"));
+        panel.add(txtEditarStock);
+
+        panel.add(new JLabel("Categoría:"));
+        panel.add(cmbEditarCategoria);
+
+        JButton btnGuardar =
+        new JButton("Guardar cambios");
+
+        dialogo.add(panel, BorderLayout.CENTER);
+        dialogo.add(btnGuardar, BorderLayout.SOUTH);
+        dialogo.setVisible(true);
  }
 
     // ========================================================
