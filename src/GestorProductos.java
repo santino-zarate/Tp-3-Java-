@@ -623,7 +623,7 @@ public class GestorProductos extends JFrame {
         txtEditarStock.requestFocus();
         return;
         }       
-        
+
         if (precio <= 0 || stock < 0) {
         JOptionPane.showMessageDialog(
                 dialogo,
@@ -634,6 +634,42 @@ public class GestorProductos extends JFrame {
         txtEditarPrecio.requestFocus();
         return;
         }
+        double valorStock =
+        precio * stock;
+        modelo.setValueAt(
+                nombre,
+                filaEditando,
+                0
+        );
+        modelo.setValueAt(
+                precio,
+                filaEditando,
+                1
+        );
+        modelo.setValueAt(
+                stock,
+                filaEditando,
+                2
+        );
+        modelo.setValueAt(
+                categoria,
+                filaEditando,
+                3
+        );
+        modelo.setValueAt(
+                valorStock,
+                filaEditando,
+                4
+        );
+        actualizarTotal();
+        dialogo.dispose();
+        JOptionPane.showMessageDialog(
+        this,
+        "Producto modificado correctamente.",
+        "Información",
+        JOptionPane.INFORMATION_MESSAGE
+);
+    }
 
     // ========================================================
     // LIMPIAR FORMULARIO
