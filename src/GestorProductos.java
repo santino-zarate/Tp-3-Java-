@@ -1,11 +1,21 @@
 // Importamos los componentes principales de Swing.
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 // Importamos DefaultTableModel para administrar los datos de la JTable.
 import javax.swing.table.DefaultTableModel;
 
 // Importamos clases para organizar los componentes gráficos.
 import java.awt.*;
+
+// TableRowSorter para poder filtrar
+// las filas de la tabla según la búsqueda.
+import javax.swing.table.TableRowSorter;
+
+// Pattern para que el buscador no falle
+// si se escriben caracteres especiales.
+import java.util.regex.Pattern;
 
 
 // ============================================================
@@ -29,6 +39,9 @@ public class GestorProductos extends JFrame {
     // Campo donde el usuario escribe el stock.
     private JTextField txtStock;
 
+    // Campo donde el usuario escribe el texto a buscar.
+    private JTextField txtBuscar;
+
     // Lista desplegable para seleccionar la categoría.
     private JComboBox<String> cmbCategoria;
 
@@ -42,6 +55,9 @@ public class GestorProductos extends JFrame {
 
     // DefaultTableModel administra las filas y columnas.
     private DefaultTableModel modelo;
+
+    // TableRowSorter administra el filtrado de las filas.
+    private TableRowSorter<DefaultTableModel> sorter;
     private int filaEditando = -1;
 
     // ========================================================
@@ -181,9 +197,45 @@ public class GestorProductos extends JFrame {
         // Creamos la tabla utilizando nuestro modelo.
         tabla = new JTable(modelo);
 
+        // Asociamos el sorter a la tabla para poder mostrar solo las filas buscadas.
+        sorter = new TableRowSorter<>(modelo);
+        tabla.setRowSorter(sorter);
+
+        // Campo que permite buscar productos por cualquiera de sus columnas.
+        txtBuscar = new JTextField();
+
+        // Cada cambio en el texto aplica nuevamente el filtro.
+        txtBuscar.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                filtrarProductos();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                filtrarProductos();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                filtrarProductos();
+            }
+        });
+
+        // Panel que agrupa la etiqueta y el campo del buscador.
+        JPanel panelBusqueda = new JPanel(new BorderLayout(10, 0));
+        panelBusqueda.setBorder(BorderFactory.createEmptyBorder(0, 15, 10, 15));
+        panelBusqueda.add(new JLabel("Buscar producto:"), BorderLayout.WEST);
+        panelBusqueda.add(txtBuscar, BorderLayout.CENTER);
+
         // JScrollPane permite desplazarnos si hay muchas filas.
         JScrollPane scrollTabla =
                 new JScrollPane(tabla);
+
+        // Ubicamos el buscador arriba de la tabla.
+        JPanel panelTabla = new JPanel(new BorderLayout());
+        panelTabla.add(panelBusqueda, BorderLayout.NORTH);
+        panelTabla.add(scrollTabla, BorderLayout.CENTER);
 
 
         // ====================================================
@@ -273,7 +325,7 @@ public class GestorProductos extends JFrame {
 
         // Tabla en el centro.
         add(
-                scrollTabla,
+                panelTabla,
                 BorderLayout.CENTER
         );
 
@@ -491,7 +543,8 @@ public class GestorProductos extends JFrame {
         return;
      }
 
-     filaEditando = filaSeleccionada;
+     // Convertimos el índice visual al índice real del modelo si hay un filtro activo.
+     filaEditando = tabla.convertRowIndexToModel(filaSeleccionada);
 
      String nombre =
         modelo.getValueAt(filaEditando, 0).toString();
@@ -719,26 +772,56 @@ public class GestorProductos extends JFrame {
             return;
         }
 
+        // Convertimos la fila visible al índice real del modelo.
+        int filaModelo = tabla.convertRowIndexToModel(filaSeleccionada);
 
-        // Pedimos confirmación al usuario.
+        // Obtenemos el nombre para identificar el producto en el mensaje.
+        String nombreProducto = modelo.getValueAt(filaModelo, 0).toString();
+
+        // Pedimos confirmación al usuario indicando qué producto se eliminará.
         int respuesta =
                 JOptionPane.showConfirmDialog(
                         this,
-                        "¿Está seguro de eliminar el producto?",
+                        "¿Está seguro de eliminar el producto: "
+                                + nombreProducto + "?",
                         "Confirmar eliminación",
-                        JOptionPane.YES_NO_OPTION
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE
                 );
 
 
         // Comprobamos si respondió "Sí".
         if (respuesta == JOptionPane.YES_OPTION) {
 
-            // Eliminamos la fila.
-            modelo.removeRow(filaSeleccionada);
+            // Eliminamos la fila real del modelo.
+            modelo.removeRow(filaModelo);
 
             // Recalculamos el total.
             actualizarTotal();
         }
+    }
+
+
+    // ========================================================
+    // FILTRAR PRODUCTOS
+    // ========================================================
+
+    private void filtrarProductos() {
+
+        // Obtenemos el texto y quitamos espacios innecesarios.
+        String textoBusqueda = txtBuscar.getText().trim();
+
+        // Si el campo está vacío, mostramos nuevamente todos los productos.
+        if (textoBusqueda.isEmpty()) {
+            sorter.setRowFilter(null);
+            return;
+        }
+
+        // quote() evita que caracteres como +, * o ? se interpreten como regex.
+        // (?i) permite buscar sin diferenciar mayúsculas de minúsculas.
+        sorter.setRowFilter(RowFilter.regexFilter(
+                "(?i)" + Pattern.quote(textoBusqueda)
+        ));
     }
 
 
