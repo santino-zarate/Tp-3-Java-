@@ -192,7 +192,14 @@ public class GestorProductos extends JFrame {
         };
 
         // Creamos el modelo sin filas inicialmente.
-        modelo = new DefaultTableModel(columnas, 0);
+        // La tabla solo muestra los datos: los cambios se realizan mediante
+        // el botón Editar, que valida los campos y recalcula los totales.
+        modelo = new DefaultTableModel(columnas, 0) {
+            @Override
+            public boolean isCellEditable(int fila, int columna) {
+                return false;
+            }
+        };
 
         // Creamos la tabla utilizando nuestro modelo.
         tabla = new JTable(modelo);
