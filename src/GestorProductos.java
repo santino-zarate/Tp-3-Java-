@@ -369,115 +369,50 @@ public class GestorProductos extends JFrame {
 
 
         // ====================================================
-        // VALIDAR NOMBRE
+        // VALIDAR DATOS
         // ====================================================
 
-        if (nombre.isEmpty()) {
+        // Validamos y convertimos los datos escritos en el formulario.
+        ValidadorProducto.ResultadoValidacion resultado =
+                ValidadorProducto.validar(
+                        nombre,
+                        precioTexto,
+                        stockTexto
+                );
 
+        // Si hay un error, informamos al usuario.
+        if (!resultado.esValido()) {
+
+            // Mostramos el mismo mensaje de error que antes.
             JOptionPane.showMessageDialog(
                     this,
-                    "Debe ingresar el nombre del producto.",
+                    resultado.getMensaje(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE
             );
 
-            // Volvemos el cursor al campo Nombre.
-            txtNombre.requestFocus();
+            // Enfocamos Nombre cuando ese campo es inválido.
+            if ("nombre".equals(resultado.getCampoAFocalizar())) {
+                txtNombre.requestFocus();
+            }
 
-            // Interrumpimos el método.
+            // Enfocamos Precio cuando no puede convertirse a número.
+            if ("precio".equals(resultado.getCampoAFocalizar())) {
+                txtPrecio.requestFocus();
+            }
+
+            // Enfocamos Stock cuando no puede convertirse a entero.
+            if ("stock".equals(resultado.getCampoAFocalizar())) {
+                txtStock.requestFocus();
+            }
+
+            // Interrumpimos el agregado si los datos son inválidos.
             return;
         }
 
-
-        // Variables donde almacenaremos
-        // los valores convertidos.
-        double precio;
-        int stock;
-
-
-        // ====================================================
-        // CONVERTIR PRECIO
-        // ====================================================
-
-        try {
-
-            // Convertimos String a double.
-            precio =
-                    Double.parseDouble(precioTexto);
-
-        } catch (NumberFormatException e) {
-
-            // Si la conversión falla, mostramos un error.
-            JOptionPane.showMessageDialog(
-                    this,
-                    "El precio debe ser un número válido.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            txtPrecio.requestFocus();
-
-            return;
-        }
-
-
-        // ====================================================
-        // CONVERTIR STOCK
-        // ====================================================
-
-        try {
-
-            // Convertimos String a int.
-            stock =
-                    Integer.parseInt(stockTexto);
-
-        } catch (NumberFormatException e) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "El stock debe ser un número entero.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            txtStock.requestFocus();
-
-            return;
-        }
-
-
-        // ====================================================
-        // VALIDAR PRECIO
-        // ====================================================
-
-        if (precio <= 0) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "El precio debe ser mayor que cero.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return;
-        }
-
-
-        // ====================================================
-        // VALIDAR STOCK
-        // ====================================================
-
-        if (stock < 0) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "El stock no puede ser negativo.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-
-            return;
-        }
+        // Obtenemos los valores ya convertidos por el validador.
+        double precio = resultado.getPrecio();
+        int stock = resultado.getStock();
 
 
         // ====================================================
