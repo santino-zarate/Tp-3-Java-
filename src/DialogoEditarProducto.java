@@ -12,17 +12,8 @@ import java.awt.*;
 // que permite editar los datos de un producto.
 public class DialogoEditarProducto extends JDialog {
 
-    // Campo donde se edita el nombre del producto.
-    private JTextField txtNombre;
-
-    // Campo donde se edita el precio del producto.
-    private JTextField txtPrecio;
-
-    // Campo donde se edita el stock del producto.
-    private JTextField txtStock;
-
-    // Lista desplegable para editar la categoría.
-    private JComboBox<String> cmbCategoria;
+    // FormularioProducto administra los campos del diálogo.
+    private FormularioProducto formulario;
 
     // Guardamos el producto editado cuando el usuario confirma los cambios.
     private Producto productoEditado;
@@ -44,53 +35,24 @@ public class DialogoEditarProducto extends JDialog {
     // crearInterfaz construye los campos y el botón para guardar cambios.
     private void crearInterfaz(Producto producto) {
 
-        // Creamos el panel que organiza los campos en filas y columnas.
-        JPanel panel = new JPanel(new GridLayout(4, 2, 10, 10));
+        // Creamos el formulario con los datos del producto seleccionado.
+        formulario = new FormularioProducto(producto);
 
-        // Agregamos un margen interno al panel.
-        panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        // Creamos el panel que organiza los campos del formulario.
+        JPanel panelFormulario = new JPanel(new GridLayout(4, 2, 10, 10));
+        panelFormulario.setBorder(
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        );
 
-        // Creamos el campo Nombre con el valor actual.
-        txtNombre = new JTextField(producto.getNombre());
-
-        // Creamos el campo Precio con el valor actual.
-        txtPrecio = new JTextField(String.valueOf(producto.getPrecio()));
-
-        // Creamos el campo Stock con el valor actual.
-        txtStock = new JTextField(String.valueOf(producto.getStock()));
-
-        // Creamos la lista de categorías.
-        cmbCategoria = new JComboBox<>();
-        cmbCategoria.addItem("Almacén");
-        cmbCategoria.addItem("Bebidas");
-        cmbCategoria.addItem("Limpieza");
-        cmbCategoria.addItem("Verduleria");
-        cmbCategoria.addItem("Tecnologia");
-        cmbCategoria.addItem("Otros");
-        cmbCategoria.setSelectedItem(producto.getCategoria());
-
-        // Agregamos la etiqueta y el campo Nombre.
-        panel.add(new JLabel("Nombre:"));
-        panel.add(txtNombre);
-
-        // Agregamos la etiqueta y el campo Precio.
-        panel.add(new JLabel("Precio:"));
-        panel.add(txtPrecio);
-
-        // Agregamos la etiqueta y el campo Stock.
-        panel.add(new JLabel("Stock:"));
-        panel.add(txtStock);
-
-        // Agregamos la etiqueta y la lista de Categoría.
-        panel.add(new JLabel("Categoría:"));
-        panel.add(cmbCategoria);
+        // Agregamos los campos del formulario al panel.
+        formulario.agregarCampos(panelFormulario);
 
         // Creamos el botón que guarda los cambios realizados.
         JButton btnGuardar = new JButton("Guardar cambios");
         btnGuardar.addActionListener(e -> guardarCambios());
 
         // Ubicamos el formulario en el centro del diálogo.
-        add(panel, BorderLayout.CENTER);
+        add(panelFormulario, BorderLayout.CENTER);
 
         // Ubicamos el botón para guardar en la parte inferior.
         add(btnGuardar, BorderLayout.SOUTH);
@@ -100,10 +62,10 @@ public class DialogoEditarProducto extends JDialog {
     private void guardarCambios() {
 
         // Obtenemos los textos escritos por el usuario.
-        String nombre = txtNombre.getText().trim();
-        String precioTexto = txtPrecio.getText().trim();
-        String stockTexto = txtStock.getText().trim();
-        String categoria = cmbCategoria.getSelectedItem().toString();
+        String nombre = formulario.getNombre();
+        String precioTexto = formulario.getPrecioTexto();
+        String stockTexto = formulario.getStockTexto();
+        String categoria = formulario.getCategoria();
 
         // Validamos y convertimos los datos escritos en el diálogo.
         ValidadorProducto.ResultadoValidacion resultado =
@@ -124,12 +86,12 @@ public class DialogoEditarProducto extends JDialog {
 
             // Enfocamos Precio cuando ese campo es inválido.
             if ("precio".equals(resultado.getCampoAFocalizar())) {
-                txtPrecio.requestFocus();
+                formulario.enfocarPrecio();
             }
 
             // Enfocamos Stock cuando ese campo es inválido.
             if ("stock".equals(resultado.getCampoAFocalizar())) {
-                txtStock.requestFocus();
+                formulario.enfocarStock();
             }
 
             // Interrumpimos el guardado si los datos son inválidos.
