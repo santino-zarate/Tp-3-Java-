@@ -92,7 +92,8 @@ public class BuscadorProductos {
         // quote evita que caracteres especiales se interpreten como regex.
         // (?i) permite buscar sin diferenciar mayúsculas de minúsculas.
         sorter.setRowFilter(RowFilter.regexFilter(
-                "(?i)" + Pattern.quote(textoBusqueda)
+                "(?i)" + Pattern.quote(textoBusqueda),
+                ModeloTablaProductos.getColumnasBuscables()
         ));
     }
 

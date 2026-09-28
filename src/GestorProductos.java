@@ -23,6 +23,9 @@ public class GestorProductos extends JFrame {
     // BuscadorProductos administra la búsqueda sobre la tabla.
     private BuscadorProductos buscador;
 
+    // SelectorFilasProductos administra los checks visibles de la tabla.
+    private SelectorFilasProductos selectorFilas;
+
 
     // ========================================================
     // COMPONENTES DE LA TABLA
@@ -33,6 +36,9 @@ public class GestorProductos extends JFrame {
 
     // ModeloTablaProductos administra las filas y columnas.
     private ModeloTablaProductos modelo;
+
+    // JButton elimina los productos que tienen su checkbox tildado.
+    private JButton btnEliminar;
 
     // ========================================================
     // COMPONENTE PARA MOSTRAR EL TOTAL
@@ -115,6 +121,9 @@ public class GestorProductos extends JFrame {
         // Creamos el buscador asociado a la tabla de productos.
         buscador = new BuscadorProductos(tabla, modelo);
 
+        // Creamos el selector para administrar las filas visibles tildadas.
+        selectorFilas = new SelectorFilasProductos(tabla, modelo);
+
         // Obtenemos el panel visual del buscador.
         JPanel panelBusqueda = buscador.getPanelBusqueda();
 
@@ -132,7 +141,10 @@ public class GestorProductos extends JFrame {
         // BOTÓN ELIMINAR
         // ====================================================
 
-        JButton btnEliminar = new JButton("Eliminar");
+        btnEliminar = new JButton("Eliminar");
+
+        // El botón comienza deshabilitado porque no hay checks tildados.
+        btnEliminar.setEnabled(false);
 
 
         // ====================================================
@@ -153,9 +165,9 @@ public class GestorProductos extends JFrame {
             // Ejecutamos nuestro método.
             agregarProducto();
         });
-        //editar
+        // Ejecutamos la edición del producto seleccionado.
         btnEditar.addActionListener(e -> {
-        editarProducto();
+            editarProducto();
         });
 
         // ====================================================
@@ -175,9 +187,19 @@ public class GestorProductos extends JFrame {
 
         btnEliminar.addActionListener(e -> {
 
-            // Eliminamos el producto seleccionado.
-            eliminarProducto();
+            // Eliminamos los productos que tengan su checkbox tildado.
+            eliminarProductosSeleccionados();
         });
+
+        // Programamos la actualización después de sincronizar modelo y sorter.
+        modelo.addTableModelListener(
+                e -> programarActualizacionBotonEliminar()
+        );
+
+        // Programamos la actualización cuando el filtro modifica las filas visibles.
+        tabla.getRowSorter().addRowSorterListener(
+                e -> programarActualizacionBotonEliminar()
+        );
 
 
         // ====================================================
@@ -345,13 +367,8 @@ public class GestorProductos extends JFrame {
         // Convertimos la fila visible a la fila real del modelo.
         int filaModelo = tabla.convertRowIndexToModel(filaSeleccionada);
 
-        // Creamos un producto con los datos de la fila seleccionada.
-        Producto productoSeleccionado = new Producto(
-                modelo.getValueAt(filaModelo, 0).toString(),
-                ((Number) modelo.getValueAt(filaModelo, 1)).doubleValue(),
-                ((Number) modelo.getValueAt(filaModelo, 2)).intValue(),
-                modelo.getValueAt(filaModelo, 3).toString()
-        );
+        // Obtenemos el producto correspondiente a la fila seleccionada.
+        Producto productoSeleccionado = modelo.obtenerProducto(filaModelo);
 
         // Mostramos el diálogo para editar el producto seleccionado.
         DialogoEditarProducto dialogo =
@@ -388,57 +405,60 @@ public class GestorProductos extends JFrame {
 
 
     // ========================================================
-    // ELIMINAR PRODUCTO
+    // ELIMINAR PRODUCTOS
     // ========================================================
 
-    private void eliminarProducto() {
+    // eliminarProductosSeleccionados confirma y elimina los checks visibles.
+    private void eliminarProductosSeleccionados() {
 
-        // getSelectedRow() devuelve el índice
-        // de la fila seleccionada.
-        int filaSeleccionada =
-                tabla.getSelectedRow();
+        // Finalizamos la edición del checkbox para guardar su estado en el modelo.
+        if (tabla.isEditing()) {
+            tabla.getCellEditor().stopCellEditing();
+        }
 
+        // Obtenemos la cantidad de productos visibles tildados.
+        int cantidadSeleccionados =
+                selectorFilas.cantidadSeleccionadosVisibles();
 
-        // Si devuelve -1 no hay selección.
-        if (filaSeleccionada == -1) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Debe seleccionar un producto.",
-                    "Aviso",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
+        // Interrumpimos si no hay checks visibles tildados.
+        if (cantidadSeleccionados == 0) {
+            actualizarEstadoBotonEliminar();
             return;
         }
 
-        // Convertimos la fila visible al índice real del modelo.
-        int filaModelo = tabla.convertRowIndexToModel(filaSeleccionada);
-
-        // Obtenemos el nombre para identificar el producto en el mensaje.
-        String nombreProducto = modelo.getValueAt(filaModelo, 0).toString();
-
-        // Pedimos confirmación al usuario indicando qué producto se eliminará.
+        // Pedimos confirmación indicando la cantidad de productos a eliminar.
         int respuesta =
                 JOptionPane.showConfirmDialog(
                         this,
-                        "¿Está seguro de eliminar el producto: "
-                                + nombreProducto + "?",
+                        "¿Eliminar " + cantidadSeleccionados + " productos?",
                         "Confirmar eliminación",
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.WARNING_MESSAGE
                 );
 
 
-        // Comprobamos si respondió "Sí".
+        // Eliminamos los productos solo si el usuario confirma.
         if (respuesta == JOptionPane.YES_OPTION) {
 
-            // Eliminamos la fila real mediante el modelo.
-            modelo.eliminarProducto(filaModelo);
+            // Eliminamos las filas visibles tildadas mediante el selector.
+            selectorFilas.eliminarSeleccionadosVisibles();
 
             // Recalculamos el total.
             actualizarTotal();
+
+            // Programamos la actualización del botón después de eliminar.
+            programarActualizacionBotonEliminar();
         }
+    }
+
+    // programarActualizacionBotonEliminar espera que la tabla actualice su sorter.
+    private void programarActualizacionBotonEliminar() {
+        SwingUtilities.invokeLater(this::actualizarEstadoBotonEliminar);
+    }
+
+    // actualizarEstadoBotonEliminar habilita el botón según los checks visibles.
+    private void actualizarEstadoBotonEliminar() {
+        btnEliminar.setEnabled(selectorFilas.haySeleccionadosVisibles());
     }
 
 
