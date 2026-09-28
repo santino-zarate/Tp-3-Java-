@@ -1,18 +1,8 @@
 // Importamos los componentes principales de Swing.
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 // Importamos clases para organizar los componentes gráficos.
 import java.awt.*;
-
-// TableRowSorter para poder filtrar
-// las filas de la tabla según la búsqueda.
-import javax.swing.table.TableRowSorter;
-
-// Pattern para que el buscador no falle
-// si se escriben caracteres especiales.
-import java.util.regex.Pattern;
 
 
 // ============================================================
@@ -30,8 +20,8 @@ public class GestorProductos extends JFrame {
     // FormularioProducto administra los campos para agregar productos.
     private FormularioProducto formulario;
 
-    // Campo donde el usuario escribe el texto a buscar.
-    private JTextField txtBuscar;
+    // BuscadorProductos administra la búsqueda sobre la tabla.
+    private BuscadorProductos buscador;
 
 
     // ========================================================
@@ -44,8 +34,6 @@ public class GestorProductos extends JFrame {
     // ModeloTablaProductos administra las filas y columnas.
     private ModeloTablaProductos modelo;
 
-    // TableRowSorter administra el filtrado de las filas.
-    private TableRowSorter<ModeloTablaProductos> sorter;
     // ========================================================
     // COMPONENTE PARA MOSTRAR EL TOTAL
     // ========================================================
@@ -124,36 +112,11 @@ public class GestorProductos extends JFrame {
         // Creamos la tabla utilizando nuestro modelo.
         tabla = new JTable(modelo);
 
-        // Asociamos el sorter a la tabla para poder mostrar solo las filas buscadas.
-        sorter = new TableRowSorter<>(modelo);
-        tabla.setRowSorter(sorter);
+        // Creamos el buscador asociado a la tabla de productos.
+        buscador = new BuscadorProductos(tabla, modelo);
 
-        // Campo que permite buscar productos por cualquiera de sus columnas.
-        txtBuscar = new JTextField();
-
-        // Cada cambio en el texto aplica nuevamente el filtro.
-        txtBuscar.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                filtrarProductos();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                filtrarProductos();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                filtrarProductos();
-            }
-        });
-
-        // Panel que agrupa la etiqueta y el campo del buscador.
-        JPanel panelBusqueda = new JPanel(new BorderLayout(10, 0));
-        panelBusqueda.setBorder(BorderFactory.createEmptyBorder(0, 15, 10, 15));
-        panelBusqueda.add(new JLabel("Buscar producto:"), BorderLayout.WEST);
-        panelBusqueda.add(txtBuscar, BorderLayout.CENTER);
+        // Obtenemos el panel visual del buscador.
+        JPanel panelBusqueda = buscador.getPanelBusqueda();
 
         // JScrollPane permite desplazarnos si hay muchas filas.
         JScrollPane scrollTabla =
@@ -476,29 +439,6 @@ public class GestorProductos extends JFrame {
             // Recalculamos el total.
             actualizarTotal();
         }
-    }
-
-
-    // ========================================================
-    // FILTRAR PRODUCTOS
-    // ========================================================
-
-    private void filtrarProductos() {
-
-        // Obtenemos el texto y quitamos espacios innecesarios.
-        String textoBusqueda = txtBuscar.getText().trim();
-
-        // Si el campo está vacío, mostramos nuevamente todos los productos.
-        if (textoBusqueda.isEmpty()) {
-            sorter.setRowFilter(null);
-            return;
-        }
-
-        // quote() evita que caracteres como +, * o ? se interpreten como regex.
-        // (?i) permite buscar sin diferenciar mayúsculas de minúsculas.
-        sorter.setRowFilter(RowFilter.regexFilter(
-                "(?i)" + Pattern.quote(textoBusqueda)
-        ));
     }
 
 
