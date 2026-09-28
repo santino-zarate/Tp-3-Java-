@@ -55,8 +55,6 @@ public class GestorProductos extends JFrame {
 
     // TableRowSorter administra el filtrado de las filas.
     private TableRowSorter<ModeloTablaProductos> sorter;
-    private int filaEditando = -1;
-
     // ========================================================
     // COMPONENTE PARA MOSTRAR EL TOTAL
     // ========================================================
@@ -435,168 +433,54 @@ public class GestorProductos extends JFrame {
         );
     }
 
-    //MÉTODO EDITAR
+    // MÉTODO EDITAR
     private void editarProducto() {
-     int filaSeleccionada =
-            tabla.getSelectedRow();
+        // Obtenemos la fila visual seleccionada por el usuario.
+        int filaSeleccionada = tabla.getSelectedRow();
 
-     if (filaSeleccionada == -1) {
-        JOptionPane.showMessageDialog(
-                this,
-                "Debe seleccionar un producto.",
-                "Aviso",
-                JOptionPane.WARNING_MESSAGE
-        );
-        return;
-     }
-
-     // Convertimos el índice visual al índice real del modelo si hay un filtro activo.
-     filaEditando = tabla.convertRowIndexToModel(filaSeleccionada);
-
-     String nombre =
-        modelo.getValueAt(filaEditando, 0).toString();
-
-     String precio =
-        modelo.getValueAt(filaEditando, 1).toString();
-
-     String stock =
-        modelo.getValueAt(filaEditando, 2).toString();
-
-     String categoria =
-        modelo.getValueAt(filaEditando, 3).toString();
-
-      JDialog dialogo =
-        new JDialog(this, "Editar producto", true);
-
-        dialogo.setSize(400, 300);
-        dialogo.setLocationRelativeTo(this);  
-
-        JPanel panel =
-        new JPanel(new GridLayout(4, 2, 10, 10));
-
-        panel.setBorder(
-        BorderFactory.createEmptyBorder(  15, 15, 15, 15));
-        JTextField txtEditarNombre =
-        new JTextField(nombre);
-
-       JTextField txtEditarPrecio =
-        new JTextField(precio);
-
-      JTextField txtEditarStock =
-        new JTextField(stock);
-
-      JComboBox<String> cmbEditarCategoria =
-        new JComboBox<>();
-        cmbEditarCategoria.addItem("Almacén");
-        cmbEditarCategoria.addItem("Bebidas");
-        cmbEditarCategoria.addItem("Limpieza");
-        cmbEditarCategoria.addItem("Verduleria");
-        cmbEditarCategoria.addItem("Tecnologia");
-        cmbEditarCategoria.addItem("Otros");
-        cmbEditarCategoria.setSelectedItem(categoria);
-        panel.add(new JLabel("Nombre:"));
-
-        panel.add(txtEditarNombre);
-
-        panel.add(new JLabel("Precio:"));
-        panel.add(txtEditarPrecio);
-
-        panel.add(new JLabel("Stock:"));
-        panel.add(txtEditarStock);
-
-        panel.add(new JLabel("Categoría:"));
-        panel.add(cmbEditarCategoria);
-
-        JButton btnGuardar =
-        new JButton("Guardar cambios");
-        btnGuardar.addActionListener(e -> {
-         guardarCambios(
-            dialogo,
-            txtEditarNombre,
-            txtEditarPrecio,
-            txtEditarStock,
-            cmbEditarCategoria
-           );
-        });
-
-        dialogo.add(panel, BorderLayout.CENTER);
-        dialogo.add(btnGuardar, BorderLayout.SOUTH);
-        dialogo.setVisible(true);
- }
-
-        //METODO GUARDAR CAMBIOS
-        private void guardarCambios(
-        JDialog dialogo,
-        JTextField txtEditarNombre,
-        JTextField txtEditarPrecio,
-        JTextField txtEditarStock,
-        JComboBox<String> cmbEditarCategoria
-) {
-    String nombre =
-            txtEditarNombre.getText().trim();
-
-    String precioTexto =
-            txtEditarPrecio.getText().trim();
-
-    String stockTexto =
-            txtEditarStock.getText().trim();
-
-    String categoria =
-            cmbEditarCategoria.getSelectedItem().toString();
-
-    // Validamos y convertimos los datos escritos en el diálogo.
-    ValidadorProducto.ResultadoValidacion resultado =
-            ValidadorProducto.validarParaEdicion(
-                    nombre,
-                    precioTexto,
-                    stockTexto
+        // Informamos si no hay ningún producto seleccionado.
+        if (filaSeleccionada == -1) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Debe seleccionar un producto.",
+                    "Aviso",
+                    JOptionPane.WARNING_MESSAGE
             );
-
-    // Si hay un error, informamos al usuario.
-    if (!resultado.esValido()) {
-        JOptionPane.showMessageDialog(
-                dialogo,
-                resultado.getMensaje(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-        );
-
-        // Enfocamos Precio cuando ese campo es inválido.
-        if ("precio".equals(resultado.getCampoAFocalizar())) {
-            txtEditarPrecio.requestFocus();
+            return;
         }
 
-        // Enfocamos Stock cuando ese campo es inválido.
-        if ("stock".equals(resultado.getCampoAFocalizar())) {
-            txtEditarStock.requestFocus();
-        }
+        // Convertimos la fila visible a la fila real del modelo.
+        int filaModelo = tabla.convertRowIndexToModel(filaSeleccionada);
 
-        // Interrumpimos el guardado si los datos son inválidos.
-        return;
-    }
-
-    // Obtenemos los valores ya convertidos por el validador.
-    double precio = resultado.getPrecio();
-    int stock = resultado.getStock();
-
-        // Creamos el producto con los datos editados.
-        Producto productoEditado = new Producto(
-                nombre,
-                precio,
-                stock,
-                categoria
+        // Creamos un producto con los datos de la fila seleccionada.
+        Producto productoSeleccionado = new Producto(
+                modelo.getValueAt(filaModelo, 0).toString(),
+                ((Number) modelo.getValueAt(filaModelo, 1)).doubleValue(),
+                ((Number) modelo.getValueAt(filaModelo, 2)).intValue(),
+                modelo.getValueAt(filaModelo, 3).toString()
         );
 
-        // Actualizamos la fila mediante el modelo de la tabla.
-        modelo.actualizarProducto(filaEditando, productoEditado);
-        actualizarTotal();
-        dialogo.dispose();
-        JOptionPane.showMessageDialog(
-        this,
-        "Producto modificado correctamente.",
-        "Información",
-        JOptionPane.INFORMATION_MESSAGE
-);
+        // Mostramos el diálogo para editar el producto seleccionado.
+        DialogoEditarProducto dialogo =
+                new DialogoEditarProducto(this, productoSeleccionado);
+        dialogo.setVisible(true);
+
+        // Obtenemos el producto editado al cerrar el diálogo.
+        Producto productoEditado = dialogo.getProductoEditado();
+
+        // Actualizamos la fila solo si el usuario guardó los cambios.
+        if (productoEditado != null) {
+            modelo.actualizarProducto(filaModelo, productoEditado);
+            actualizarTotal();
+
+            // Informamos que la modificación fue exitosa.
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Producto modificado correctamente.",
+                    "Información",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+        }
     }
 
     // ========================================================
