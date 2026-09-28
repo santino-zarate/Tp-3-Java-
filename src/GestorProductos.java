@@ -3,9 +3,6 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-// Importamos DefaultTableModel para administrar los datos de la JTable.
-import javax.swing.table.DefaultTableModel;
-
 // Importamos clases para organizar los componentes gráficos.
 import java.awt.*;
 
@@ -53,11 +50,11 @@ public class GestorProductos extends JFrame {
     // JTable muestra los productos al usuario.
     private JTable tabla;
 
-    // DefaultTableModel administra las filas y columnas.
-    private DefaultTableModel modelo;
+    // ModeloTablaProductos administra las filas y columnas.
+    private ModeloTablaProductos modelo;
 
     // TableRowSorter administra el filtrado de las filas.
-    private TableRowSorter<DefaultTableModel> sorter;
+    private TableRowSorter<ModeloTablaProductos> sorter;
     private int filaEditando = -1;
 
     // ========================================================
@@ -182,24 +179,8 @@ public class GestorProductos extends JFrame {
         // CREAR TABLA
         // ====================================================
 
-        // Nombres de las columnas.
-        String[] columnas = {
-                "Nombre",
-                "Precio",
-                "Stock",
-                "Categoría",
-                "Valor Stock"
-        };
-
-        // Creamos el modelo sin filas inicialmente.
-        // La tabla solo muestra los datos: los cambios se realizan mediante
-        // el botón Editar, que valida los campos y recalcula los totales.
-        modelo = new DefaultTableModel(columnas, 0) {
-            @Override
-            public boolean isCellEditable(int fila, int columna) {
-                return false;
-            }
-        };
+        // Creamos el modelo que administra los datos de la tabla.
+        modelo = new ModeloTablaProductos();
 
         // Creamos la tabla utilizando nuestro modelo.
         tabla = new JTable(modelo);
@@ -434,24 +415,8 @@ public class GestorProductos extends JFrame {
         // AGREGAR A LA TABLA
         // ====================================================
 
-        // addRow agrega una nueva fila.
-        modelo.addRow(new Object[] {
-
-                // Columna 1.
-                producto.getNombre(),
-
-                // Columna 2.
-                producto.getPrecio(),
-
-                // Columna 3.
-                producto.getStock(),
-
-                // Columna 4.
-                producto.getCategoria(),
-
-                // Columna 5.
-                producto.getValorStock()
-        });
+        // Agregamos el producto mediante el modelo de la tabla.
+        modelo.agregarProducto(producto);
 
 
         // Actualizamos el total.
@@ -613,33 +578,17 @@ public class GestorProductos extends JFrame {
     // Obtenemos los valores ya convertidos por el validador.
     double precio = resultado.getPrecio();
     int stock = resultado.getStock();
-        double valorStock =
-        precio * stock;
-        modelo.setValueAt(
+
+        // Creamos el producto con los datos editados.
+        Producto productoEditado = new Producto(
                 nombre,
-                filaEditando,
-                0
-        );
-        modelo.setValueAt(
                 precio,
-                filaEditando,
-                1
-        );
-        modelo.setValueAt(
                 stock,
-                filaEditando,
-                2
+                categoria
         );
-        modelo.setValueAt(
-                categoria,
-                filaEditando,
-                3
-        );
-        modelo.setValueAt(
-                valorStock,
-                filaEditando,
-                4
-        );
+
+        // Actualizamos la fila mediante el modelo de la tabla.
+        modelo.actualizarProducto(filaEditando, productoEditado);
         actualizarTotal();
         dialogo.dispose();
         JOptionPane.showMessageDialog(
@@ -719,8 +668,8 @@ public class GestorProductos extends JFrame {
         // Comprobamos si respondió "Sí".
         if (respuesta == JOptionPane.YES_OPTION) {
 
-            // Eliminamos la fila real del modelo.
-            modelo.removeRow(filaModelo);
+            // Eliminamos la fila real mediante el modelo.
+            modelo.eliminarProducto(filaModelo);
 
             // Recalculamos el total.
             actualizarTotal();
@@ -757,29 +706,8 @@ public class GestorProductos extends JFrame {
 
     private void actualizarTotal() {
 
-        // Comenzamos en cero.
-        double total = 0;
-
-
-        // Recorremos todas las filas.
-        for (
-                int i = 0;
-                i < modelo.getRowCount();
-                i++
-        ) {
-
-            // Obtenemos la columna 4,
-            // que corresponde a Valor Stock.
-            double valor =
-                    Double.parseDouble(
-                            modelo
-                                    .getValueAt(i, 4)
-                                    .toString()
-                    );
-
-            // Sumamos el valor.
-            total += valor;
-        }
+        // Calculamos el total mediante el modelo de la tabla.
+        double total = modelo.calcularTotal();
 
 
         // Actualizamos el JLabel.
