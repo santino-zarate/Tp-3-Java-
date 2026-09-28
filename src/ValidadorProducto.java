@@ -146,4 +146,48 @@ public class ValidadorProducto {
                 stock
         );
     }
+
+    // validarParaEdicion conserva las reglas y los mensajes
+    // que utiliza el diálogo para editar un producto.
+    public static ResultadoValidacion validarParaEdicion(
+            String nombre,
+            String precioTexto,
+            String stockTexto
+    ) {
+
+        // Validamos que todos los campos estén completos.
+        if (nombre.isEmpty()
+                || precioTexto.isEmpty()
+                || stockTexto.isEmpty()) {
+            return new ResultadoValidacion(
+                    false,
+                    "Debe completar todos los campos.",
+                    null,
+                    0,
+                    0
+            );
+        }
+
+        // Reutilizamos la validación general para convertir los datos.
+        ResultadoValidacion resultado = validar(
+                nombre,
+                precioTexto,
+                stockTexto
+        );
+
+        // Si el precio o el stock no cumplen su rango, usamos el mensaje de edición.
+        if (!resultado.esValido()
+                && resultado.getCampoAFocalizar() == null) {
+            return new ResultadoValidacion(
+                    false,
+                    "El precio debe ser mayor que cero y el stock no puede ser negativo.",
+                    "precio",
+                    0,
+                    0
+            );
+        }
+
+        // Devolvemos el resultado cuando no hay error de rango.
+        return resultado;
+    }
 }

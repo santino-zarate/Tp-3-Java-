@@ -579,56 +579,40 @@ public class GestorProductos extends JFrame {
     String categoria =
             cmbEditarCategoria.getSelectedItem().toString();
 
-     if (nombre.isEmpty() ||
-                precioTexto.isEmpty() ||
-                stockTexto.isEmpty()) {
+    // Validamos y convertimos los datos escritos en el diálogo.
+    ValidadorProducto.ResultadoValidacion resultado =
+            ValidadorProducto.validarParaEdicion(
+                    nombre,
+                    precioTexto,
+                    stockTexto
+            );
 
+    // Si hay un error, informamos al usuario.
+    if (!resultado.esValido()) {
         JOptionPane.showMessageDialog(
                 dialogo,
-                "Debe completar todos los campos.",
+                resultado.getMensaje(),
                 "Error",
                 JOptionPane.ERROR_MESSAGE
         );
-        return;
-        }
-        double precio;
-        int stock;
-        try {
-        precio = Double.parseDouble(precioTexto);
-        } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(
-                dialogo,
-                "El precio debe ser un número válido.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-        );
-        txtEditarPrecio.requestFocus();
-        return;
-        }
-        try {
-        stock =
-                Integer.parseInt(stockTexto);
-        } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(
-                dialogo,
-                "El stock debe ser un número entero.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-        );
-        txtEditarStock.requestFocus();
-        return;
-        }       
 
-        if (precio <= 0 || stock < 0) {
-        JOptionPane.showMessageDialog(
-                dialogo,
-                "El precio debe ser mayor que cero y el stock no puede ser negativo.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-        );
-        txtEditarPrecio.requestFocus();
-        return;
+        // Enfocamos Precio cuando ese campo es inválido.
+        if ("precio".equals(resultado.getCampoAFocalizar())) {
+            txtEditarPrecio.requestFocus();
         }
+
+        // Enfocamos Stock cuando ese campo es inválido.
+        if ("stock".equals(resultado.getCampoAFocalizar())) {
+            txtEditarStock.requestFocus();
+        }
+
+        // Interrumpimos el guardado si los datos son inválidos.
+        return;
+    }
+
+    // Obtenemos los valores ya convertidos por el validador.
+    double precio = resultado.getPrecio();
+    int stock = resultado.getStock();
         double valorStock =
         precio * stock;
         modelo.setValueAt(
