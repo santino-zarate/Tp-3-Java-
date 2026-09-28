@@ -27,20 +27,11 @@ public class GestorProductos extends JFrame {
     // COMPONENTES DEL FORMULARIO
     // ========================================================
 
-    // Campo donde el usuario escribe el nombre.
-    private JTextField txtNombre;
-
-    // Campo donde el usuario escribe el precio.
-    private JTextField txtPrecio;
-
-    // Campo donde el usuario escribe el stock.
-    private JTextField txtStock;
+    // FormularioProducto administra los campos para agregar productos.
+    private FormularioProducto formulario;
 
     // Campo donde el usuario escribe el texto a buscar.
     private JTextField txtBuscar;
-
-    // Lista desplegable para seleccionar la categoría.
-    private JComboBox<String> cmbCategoria;
 
 
     // ========================================================
@@ -104,61 +95,11 @@ public class GestorProductos extends JFrame {
         );
 
 
-        // ----------------------------------------------------
-        // CAMPO NOMBRE
-        // ----------------------------------------------------
+        // Creamos el formulario reutilizable para agregar productos.
+        formulario = new FormularioProducto();
 
-        // Agregamos la etiqueta.
-        panelFormulario.add(new JLabel("Nombre:"));
-
-        // Creamos el campo de texto.
-        txtNombre = new JTextField();
-
-        // Agregamos el campo al formulario.
-        panelFormulario.add(txtNombre);
-
-
-        // ----------------------------------------------------
-        // CAMPO PRECIO
-        // ----------------------------------------------------
-
-        panelFormulario.add(new JLabel("Precio:"));
-
-        txtPrecio = new JTextField();
-
-        panelFormulario.add(txtPrecio);
-
-
-        // ----------------------------------------------------
-        // CAMPO STOCK
-        // ----------------------------------------------------
-
-        panelFormulario.add(new JLabel("Stock:"));
-
-        txtStock = new JTextField();
-
-        panelFormulario.add(txtStock);
-
-
-        // ----------------------------------------------------
-        // CATEGORÍA
-        // ----------------------------------------------------
-
-        panelFormulario.add(new JLabel("Categoría:"));
-
-        // Creamos el ComboBox.
-        cmbCategoria = new JComboBox<>();
-
-        // Agregamos las opciones.
-        cmbCategoria.addItem("Almacén");
-        cmbCategoria.addItem("Bebidas");
-        cmbCategoria.addItem("Limpieza");
-        cmbCategoria.addItem("Verduleria");
-        cmbCategoria.addItem("Tecnologia");
-        cmbCategoria.addItem("Otros");
-
-        // Agregamos el ComboBox.
-        panelFormulario.add(cmbCategoria);
+        // Agregamos los campos en la grilla del formulario principal.
+        formulario.agregarCampos(panelFormulario);
 
 
         // ----------------------------------------------------
@@ -329,22 +270,11 @@ public class GestorProductos extends JFrame {
 
     private void agregarProducto() {
 
-        // Obtenemos el nombre escrito.
-        // trim() elimina espacios al principio y al final.
-        String nombre =
-                txtNombre.getText().trim();
-
-        // Obtenemos el precio como texto.
-        String precioTexto =
-                txtPrecio.getText().trim();
-
-        // Obtenemos el stock como texto.
-        String stockTexto =
-                txtStock.getText().trim();
-
-        // Obtenemos la categoría seleccionada.
-        String categoria =
-                cmbCategoria.getSelectedItem().toString();
+        // Obtenemos los datos escritos en el formulario.
+        String nombre = formulario.getNombre();
+        String precioTexto = formulario.getPrecioTexto();
+        String stockTexto = formulario.getStockTexto();
+        String categoria = formulario.getCategoria();
 
 
         // ====================================================
@@ -372,17 +302,17 @@ public class GestorProductos extends JFrame {
 
             // Enfocamos Nombre cuando ese campo es inválido.
             if ("nombre".equals(resultado.getCampoAFocalizar())) {
-                txtNombre.requestFocus();
+                formulario.enfocarNombre();
             }
 
             // Enfocamos Precio cuando no puede convertirse a número.
             if ("precio".equals(resultado.getCampoAFocalizar())) {
-                txtPrecio.requestFocus();
+                formulario.enfocarPrecio();
             }
 
             // Enfocamos Stock cuando no puede convertirse a entero.
             if ("stock".equals(resultado.getCampoAFocalizar())) {
-                txtStock.requestFocus();
+                formulario.enfocarStock();
             }
 
             // Interrumpimos el agregado si los datos son inválidos.
@@ -489,20 +419,8 @@ public class GestorProductos extends JFrame {
 
     private void limpiarFormulario() {
 
-        // Borramos el nombre.
-        txtNombre.setText("");
-
-        // Borramos el precio.
-        txtPrecio.setText("");
-
-        // Borramos el stock.
-        txtStock.setText("");
-
-        // Seleccionamos la primera categoría.
-        cmbCategoria.setSelectedIndex(0);
-
-        // Volvemos a colocar el cursor en Nombre.
-        txtNombre.requestFocus();
+        // Limpiamos los campos mediante el formulario reutilizable.
+        formulario.limpiar();
     }
 
 
