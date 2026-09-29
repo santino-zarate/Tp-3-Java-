@@ -38,4 +38,45 @@ public class EstadisticasProductos {
     public double valorTotalInventario() {
         return modelo.calcularTotal();
     }
+
+    public String valoresPorCategoria() {
+    StringBuilder resultado = new StringBuilder();
+    for (int fila = 0; fila < modelo.getRowCount(); fila++) {
+        String categoria =
+                modelo.getValueAt(
+                        fila,
+                        ModeloTablaProductos.COLUMNA_CATEGORIA
+                ).toString();
+        boolean yaMostrada = resultado
+                .toString()
+                .contains(categoria + ":");
+        if (!yaMostrada) {
+            double total = 0;
+            for (int otraFila = 0;
+                    otraFila < modelo.getRowCount();
+                    otraFila++) {
+                String otraCategoria =
+                        modelo.getValueAt(
+                                otraFila,
+                                ModeloTablaProductos.COLUMNA_CATEGORIA
+                        ).toString();
+                if (otraCategoria.equals(categoria)) {
+                    Number valor =
+                            (Number) modelo.getValueAt(
+                                    otraFila,
+                                    ModeloTablaProductos.COLUMNA_VALOR_STOCK
+                            );
+                    total += valor.doubleValue();
+                }
+            }
+            resultado.append(
+                    categoria
+                    + ": $"
+                    + String.format("%.2f", total)
+                    + "\n"
+            );
+        }
+    }
+    return resultado.toString();
+}
 }

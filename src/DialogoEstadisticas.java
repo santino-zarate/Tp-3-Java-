@@ -100,15 +100,35 @@ public class DialogoEstadisticas extends JDialog {
         JScrollPane scrollProductos =
                 new JScrollPane(areaProductos);
 
+        JTextArea areaCategorias =
+        new JTextArea();
+        areaCategorias.setEditable(false);
+        areaCategorias.append(
+                "Valor por categoría:\n"
+        );
+        areaCategorias.append(
+                "------------------------------\n"
+        );
+        areaCategorias.append(
+                estadisticas.valoresPorCategoria()
+        );
+
+        JScrollPane scrollCategorias =
+                new JScrollPane(areaCategorias);
+
+        JPanel panelListas =
+        new JPanel(new GridLayout(2, 1, 5, 5));
+        panelListas.add(scrollProductos);
+        panelListas.add(scrollCategorias);
         panelContenido.add(
-        scrollProductos,
-        BorderLayout.CENTER
+                panelListas,
+                BorderLayout.CENTER
         );
 
         panelPrincipal.add(
         panelContenido,
         BorderLayout.CENTER
-);
+        );
 
         // Botón cerrar
         JButton btnCerrar = new JButton("Cerrar");
