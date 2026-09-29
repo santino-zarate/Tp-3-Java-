@@ -69,9 +69,12 @@ public class DialogoEstadisticas extends JDialog {
         panelResumen.add(lblCantidadUnidades);
         panelResumen.add(lblValorTotal);
 
-        panelPrincipal.add(
+        JPanel panelContenido =
+                new JPanel(new BorderLayout(10, 10));
+
+        panelContenido.add(
                 panelResumen,
-                BorderLayout.CENTER
+                BorderLayout.NORTH
         );
 
         // Valores por producto
@@ -97,10 +100,15 @@ public class DialogoEstadisticas extends JDialog {
         JScrollPane scrollProductos =
                 new JScrollPane(areaProductos);
 
-        panelPrincipal.add(
-                scrollProductos,
-                BorderLayout.SOUTH
+        panelContenido.add(
+        scrollProductos,
+        BorderLayout.CENTER
         );
+
+        panelPrincipal.add(
+        panelContenido,
+        BorderLayout.CENTER
+);
 
         // Botón cerrar
         JButton btnCerrar = new JButton("Cerrar");
@@ -111,10 +119,9 @@ public class DialogoEstadisticas extends JDialog {
         panelBoton.add(btnCerrar);
 
         panelPrincipal.add(
-                panelBoton,
-                BorderLayout.PAGE_END
+        panelBoton,
+        BorderLayout.SOUTH
         );
-
         add(panelPrincipal);
     }
 }

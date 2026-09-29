@@ -4,19 +4,12 @@ import javax.swing.*;
 // Importamos clases para organizar los componentes gráficos.
 import java.awt.*;
 
-
-// ============================================================
 // CLASE PRINCIPAL
-// ============================================================
-
 // GestorProductos hereda de JFrame.
 // Por lo tanto, esta clase representa una ventana.
 public class GestorProductos extends JFrame {
 
-    // ========================================================
     // COMPONENTES DEL FORMULARIO
-    // ========================================================
-
     // FormularioProducto administra los campos para agregar productos.
     private FormularioProducto formulario;
 
@@ -27,10 +20,7 @@ public class GestorProductos extends JFrame {
     private SelectorFilasProductos selectorFilas;
 
 
-    // ========================================================
     // COMPONENTES DE LA TABLA
-    // ========================================================
-
     // JTable muestra los productos al usuario.
     private JTable tabla;
 
@@ -39,19 +29,9 @@ public class GestorProductos extends JFrame {
 
     // JButton elimina los productos que tienen su checkbox tildado.
     private JButton btnEliminar;
+    private JButton btnEstadisticas;
 
-    // ========================================================
-    // COMPONENTE PARA MOSTRAR EL TOTAL
-    // ========================================================
-
-    // JLabel utilizado para mostrar el valor total del stock.
-    private JLabel lblTotal;
-
-
-    // ========================================================
     // CONSTRUCTOR
-    // ========================================================
-
     public GestorProductos() {
 
         // Título que aparecerá en la ventana.
@@ -70,10 +50,7 @@ public class GestorProductos extends JFrame {
         crearInterfaz();
     }
 
-
-    // ========================================================
     // CREAR INTERFAZ
-    // ========================================================
 
     private void crearInterfaz() {
 
@@ -95,10 +72,7 @@ public class GestorProductos extends JFrame {
         // Agregamos los campos en la grilla del formulario principal.
         formulario.agregarCampos(panelFormulario);
 
-
-        // ----------------------------------------------------
         // BOTONES
-        // ----------------------------------------------------
 
         JButton btnAgregar = new JButton("Agregar");
         JButton btnLimpiar = new JButton("Limpiar");
@@ -108,10 +82,7 @@ public class GestorProductos extends JFrame {
         panelFormulario.add(btnAgregar);
         panelFormulario.add(btnEditar);
        
-        // ====================================================
         // CREAR TABLA
-        // ====================================================
-
         // Creamos el modelo que administra los datos de la tabla.
         modelo = new ModeloTablaProductos();
 
@@ -136,29 +107,13 @@ public class GestorProductos extends JFrame {
         panelTabla.add(panelBusqueda, BorderLayout.NORTH);
         panelTabla.add(scrollTabla, BorderLayout.CENTER);
 
-
-        // ====================================================
         // BOTÓN ELIMINAR
-        // ====================================================
-
         btnEliminar = new JButton("Eliminar");
-
         // El botón comienza deshabilitado porque no hay checks tildados.
         btnEliminar.setEnabled(false);
+        btnEstadisticas = new JButton("Ver estadísticas");
 
-
-        // ====================================================
-        // ETIQUETA TOTAL
-        // ====================================================
-
-        lblTotal =
-                new JLabel("Valor total del stock: $0.00");
-
-
-        // ====================================================
         // EVENTO AGREGAR
-        // ====================================================
-
         // addActionListener detecta el clic del botón.
         btnAgregar.addActionListener(e -> {
 
@@ -170,27 +125,23 @@ public class GestorProductos extends JFrame {
             editarProducto();
         });
 
-        // ====================================================
         // EVENTO LIMPIAR
-        // ====================================================
-
         btnLimpiar.addActionListener(e -> {
 
             // Limpiamos los campos.
             limpiarFormulario();
         });
 
-
-        // ====================================================
         // EVENTO ELIMINAR
-        // ====================================================
-
         btnEliminar.addActionListener(e -> {
 
             // Eliminamos los productos que tengan su checkbox tildado.
             eliminarProductosSeleccionados();
         });
-
+        // EVENTO ESTADÍSTICAS
+        btnEstadisticas.addActionListener(e -> {
+        mostrarEstadisticas();
+        });     
         // Programamos la actualización después de sincronizar modelo y sorter.
         modelo.addTableModelListener(
                 e -> programarActualizacionBotonEliminar()
@@ -201,11 +152,7 @@ public class GestorProductos extends JFrame {
                 e -> programarActualizacionBotonEliminar()
         );
 
-
-        // ====================================================
         // PANEL INFERIOR
-        // ====================================================
-
         JPanel panelInferior =
                 new JPanel(new BorderLayout());
 
@@ -214,18 +161,12 @@ public class GestorProductos extends JFrame {
                 btnEliminar,
                 BorderLayout.WEST
         );
-
-        // Total a la derecha.
         panelInferior.add(
-                lblTotal,
-                BorderLayout.EAST
-        );
+        btnEstadisticas,
+        BorderLayout.EAST
+       );
 
-
-        // ====================================================
         // CONFIGURAR VENTANA
-        // ====================================================
-
         // Utilizamos BorderLayout para la ventana.
         setLayout(new BorderLayout());
 
@@ -248,11 +189,7 @@ public class GestorProductos extends JFrame {
         );
     }
 
-
-    // ========================================================
     // AGREGAR PRODUCTO
-    // ========================================================
-
     private void agregarProducto() {
 
         // Obtenemos los datos escritos en el formulario.
@@ -261,11 +198,7 @@ public class GestorProductos extends JFrame {
         String stockTexto = formulario.getStockTexto();
         String categoria = formulario.getCategoria();
 
-
-        // ====================================================
         // VALIDAR DATOS
-        // ====================================================
-
         // Validamos y convertimos los datos escritos en el formulario.
         ValidadorProducto.ResultadoValidacion resultado =
                 ValidadorProducto.validar(
@@ -308,11 +241,7 @@ public class GestorProductos extends JFrame {
         double precio = resultado.getPrecio();
         int stock = resultado.getStock();
 
-
-        // ====================================================
         // CREAR OBJETO
-        // ====================================================
-
         // Creamos un objeto Producto utilizando
         // los datos ingresados por el usuario.
         Producto producto =
@@ -323,21 +252,12 @@ public class GestorProductos extends JFrame {
                         categoria
                 );
 
-
-        // ====================================================
         // AGREGAR A LA TABLA
-        // ====================================================
-
         // Agregamos el producto mediante el modelo de la tabla.
         modelo.agregarProducto(producto);
 
-
-        // Actualizamos el total.
-        actualizarTotal();
-
         // Limpiamos el formulario.
         limpiarFormulario();
-
 
         // Informamos que la operación fue exitosa.
         JOptionPane.showMessageDialog(
@@ -381,7 +301,6 @@ public class GestorProductos extends JFrame {
         // Actualizamos la fila solo si el usuario guardó los cambios.
         if (productoEditado != null) {
             modelo.actualizarProducto(filaModelo, productoEditado);
-            actualizarTotal();
 
             // Informamos que la modificación fue exitosa.
             JOptionPane.showMessageDialog(
@@ -393,9 +312,7 @@ public class GestorProductos extends JFrame {
         }
     }
 
-    // ========================================================
     // LIMPIAR FORMULARIO
-    // ========================================================
 
     private void limpiarFormulario() {
 
@@ -403,11 +320,7 @@ public class GestorProductos extends JFrame {
         formulario.limpiar();
     }
 
-
-    // ========================================================
     // ELIMINAR PRODUCTOS
-    // ========================================================
-
     // eliminarProductosSeleccionados confirma y elimina los checks visibles.
     private void eliminarProductosSeleccionados() {
 
@@ -443,9 +356,6 @@ public class GestorProductos extends JFrame {
             // Eliminamos las filas visibles tildadas mediante el selector.
             selectorFilas.eliminarSeleccionadosVisibles();
 
-            // Recalculamos el total.
-            actualizarTotal();
-
             // Programamos la actualización del botón después de eliminar.
             programarActualizacionBotonEliminar();
         }
@@ -460,32 +370,14 @@ public class GestorProductos extends JFrame {
     private void actualizarEstadoBotonEliminar() {
         btnEliminar.setEnabled(selectorFilas.haySeleccionadosVisibles());
     }
+        private void mostrarEstadisticas() {
 
+        DialogoEstadisticas dialogo =
+                new DialogoEstadisticas(this, modelo);
 
-    // ========================================================
-    // ACTUALIZAR TOTAL
-    // ========================================================
-
-    private void actualizarTotal() {
-
-        // Calculamos el total mediante el modelo de la tabla.
-        double total = modelo.calcularTotal();
-
-
-        // Actualizamos el JLabel.
-        lblTotal.setText(
-                String.format(
-                        "Valor total del stock: $%.2f",
-                        total
-                )
-        );
-    }
-
-
-    // ========================================================
+        dialogo.setVisible(true);
+        }
     // MÉTODO MAIN
-    // ========================================================
-
     // Punto de entrada de nuestro programa.
     public static void main(String[] args) {
 

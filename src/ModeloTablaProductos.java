@@ -4,10 +4,7 @@ import javax.swing.table.DefaultTableModel;
 // Importamos Arrays para ordenar las filas antes de eliminarlas.
 import java.util.Arrays;
 
-// ============================================================
 // CLASE MODELO TABLA PRODUCTOS
-// ============================================================
-
 // ModeloTablaProductos administra los datos
 // que se muestran en la tabla de productos.
 public class ModeloTablaProductos extends DefaultTableModel {

@@ -1,7 +1,4 @@
-// ============================================================
 // CLASE ESTADISTICAS PRODUCTOS
-// ============================================================
-
 // EstadisticasProductos se encarga de calcular
 // información estadística a partir de los productos de la tabla.
 public class EstadisticasProductos {
