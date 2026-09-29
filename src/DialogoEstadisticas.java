@@ -38,16 +38,20 @@ public class DialogoEstadisticas extends JDialog {
         );
 
         titulo.setFont(
-                new Font("Arial", Font.BOLD, 20)
+                new Font("Arial", Font.BOLD, 22)
         );
-
+        titulo.setBorder(
+        BorderFactory.createEmptyBorder(
+                0, 0, 10, 0
+        )
+        );
         panelPrincipal.add(titulo, BorderLayout.NORTH);
 
         // Información general
         JPanel panelResumen = new JPanel(
-                new GridLayout(3, 1, 5, 5)
+                new GridLayout(3, 1, 5, 10)
         );
-
+    
         JLabel lblCantidadProductos = new JLabel(
                 "Cantidad de productos: "
                 + estadisticas.cantidadProductos()

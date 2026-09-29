@@ -1,22 +1,15 @@
-// Importamos DefaultTableModel para administrar las filas y columnas de la tabla.
 import javax.swing.table.DefaultTableModel;
-
-// Importamos Arrays para ordenar las filas antes de eliminarlas.
 import java.util.Arrays;
-
 // CLASE MODELO TABLA PRODUCTOS
-// ModeloTablaProductos administra los datos
-// que se muestran en la tabla de productos.
+// administra los datos que se muestran en la tabla de productos.
 public class ModeloTablaProductos extends DefaultTableModel {
-
-    // Definimos los índices de las columnas para evitar números mágicos.
+    // Definimos los índices de las columnas 
     public static final int COLUMNA_SELECCION = 0;
     public static final int COLUMNA_NOMBRE = 1;
     public static final int COLUMNA_PRECIO = 2;
     public static final int COLUMNA_STOCK = 3;
     public static final int COLUMNA_CATEGORIA = 4;
     public static final int COLUMNA_VALOR_STOCK = 5;
-
     // Definimos los nombres de las columnas de la tabla.
     private static final String[] COLUMNAS = {
             "Sel.",
@@ -26,22 +19,18 @@ public class ModeloTablaProductos extends DefaultTableModel {
             "Categoría",
             "Valor Stock"
     };
-
-    // Creamos el modelo sin filas iniciales.
+    // Creamos el modelo
     public ModeloTablaProductos() {
         super(COLUMNAS, 0);
     }
-
     // Devolvemos Boolean para que la tabla dibuje un checkbox en Selección.
     @Override
     public Class<?> getColumnClass(int columna) {
         if (columna == COLUMNA_SELECCION) {
             return Boolean.class;
         }
-
         return super.getColumnClass(columna);
     }
-
     // Permitimos editar solamente los checkboxes de Selección.
     @Override
     public boolean isCellEditable(int fila, int columna) {
